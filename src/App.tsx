@@ -24,19 +24,23 @@ ChartJS.register(
 );
 
 const App: React.FC = () => {
-  const [loanAmount, setLoanAmount] = useState(50000);
-  const [loanAPR, setLoanAPR] = useState(5);
-  const [loanTerm, setLoanTerm] = useState(10);
+  const [loanAmount, setLoanAmount] = useState<number | ''>(50000);
+  const [loanAPR, setLoanAPR] = useState<number | ''>(5);
+  const [loanTerm, setLoanTerm] = useState<number | ''>(10);
   const [selectedEtf, setSelectedEtf] = useState(TOP_ETFS[1]); // Default VOO
 
+  const nLoanAmount = Number(loanAmount) || 0;
+  const nLoanAPR = Number(loanAPR) || 0;
+  const nLoanTerm = Number(loanTerm) || 0;
+
   const monthlyPayment = useMemo(() => 
-    calculateMonthlyPayment(loanAmount, loanAPR, loanTerm),
-    [loanAmount, loanAPR, loanTerm]
+    calculateMonthlyPayment(nLoanAmount, nLoanAPR, nLoanTerm),
+    [nLoanAmount, nLoanAPR, nLoanTerm]
   );
 
   const growthData = useMemo(() => 
-    calculateGrowthData(loanAmount, loanAPR, loanTerm, selectedEtf),
-    [loanAmount, loanAPR, loanTerm, selectedEtf]
+    calculateGrowthData(nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf),
+    [nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf]
   );
 
   const chartData = {
@@ -87,7 +91,7 @@ const App: React.FC = () => {
   const winner = finalA > finalBAvg ? 'Pay Off Debt First' : 'Invest Now (Avg)';
   const difference = Math.abs(finalA - finalBAvg);
 
-  const backtest = calculateHistoricalBacktest(selectedEtf, loanTerm, loanAmount);
+  const backtest = calculateHistoricalBacktest(selectedEtf, nLoanTerm, nLoanAmount);
 
   return (
     <div className="container">
@@ -102,15 +106,15 @@ const App: React.FC = () => {
             <h3>Loan & Horizon Details</h3>
             <label>
               Loan Amount ($)
-              <input type="number" value={loanAmount} onChange={e => setLoanAmount(Number(e.target.value))} />
+              <input type="number" value={loanAmount} onChange={e => setLoanAmount(e.target.value === '' ? '' : Number(e.target.value))} />
             </label>
             <label>
               APR (%)
-              <input type="number" value={loanAPR} step="0.1" onChange={e => setLoanAPR(Number(e.target.value))} />
+              <input type="number" value={loanAPR} step="0.1" onChange={e => setLoanAPR(e.target.value === '' ? '' : Number(e.target.value))} />
             </label>
             <label>
               Term / Horizon (Years)
-              <input type="number" value={loanTerm} onChange={e => setLoanTerm(Number(e.target.value))} />
+              <input type="number" value={loanTerm} onChange={e => setLoanTerm(e.target.value === '' ? '' : Number(e.target.value))} />
             </label>
             <div className="info-box">
               Estimated Monthly Payment: <strong>${monthlyPayment.toFixed(2)}</strong>
@@ -152,7 +156,7 @@ const App: React.FC = () => {
           <div className="summary-card" data-winner={winner.includes('Debt') ? 'Pay Off Debt First' : 'Invest Now'}>
             <h2>Recommendation: {winner}</h2>
             <p>
-              Over {loanTerm} years, Scenario B (Avg) is projected to {finalBAvg > finalA ? 'outperform' : 'underperform'} Scenario A by <strong>${difference.toLocaleString()}</strong>.
+              Over {nLoanTerm} years, Scenario B (Avg) is projected to {finalBAvg > finalA ? 'outperform' : 'underperform'} Scenario A by <strong>${difference.toLocaleString()}</strong>.
             </p>
           </div>
 
@@ -164,8 +168,16 @@ const App: React.FC = () => {
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
-                  legend: { position: 'top' as const },
-                  title: { display: true, text: `Projection: ${selectedEtf.symbol} vs Loan (${loanAPR}%)` },
+                  legend: { 
+                    position: 'bottom' as const,
+                    labels: {
+                      boxWidth: 15,
+                      padding: 15,
+                      usePointStyle: true,
+                      pointStyle: 'circle'
+                    }
+                  },
+                  title: { display: true, text: `Projection: ${selectedEtf.symbol} vs Loan (${nLoanAPR}%)` },
                 },
                 scales: {
                   y: { ticks: { callback: (value) => '$' + Number(value).toLocaleString() } }
@@ -178,12 +190,12 @@ const App: React.FC = () => {
             <h3>Historical Comparison (Backtest)</h3>
             <div className="backtest-grid">
               <div className="backtest-card">
-                <h4>What if you invested ${loanAmount.toLocaleString()} in {selectedEtf.symbol} {loanTerm} years ago?</h4>
+                <h4>What if you invested ${nLoanAmount.toLocaleString()} in {selectedEtf.symbol} {nLoanTerm} years ago?</h4>
                 <div className="backtest-value">${backtest.finalValue.toLocaleString()}</div>
                 <p>A {backtest.multiple}x return on your capital.</p>
               </div>
               <div className="backtest-card secondary">
-                <h4>What if you paid off ${loanAmount.toLocaleString()} debt @ {loanAPR}% {loanTerm} years ago?</h4>
+                <h4>What if you paid off ${nLoanAmount.toLocaleString()} debt @ {nLoanAPR}% {nLoanTerm} years ago?</h4>
                 <div className="backtest-value">${finalA.toLocaleString()}</div>
                 <p>Portfolio value from diverted payments.</p>
               </div>
