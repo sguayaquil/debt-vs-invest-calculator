@@ -39,7 +39,8 @@ export const calculateGrowthData = (
   loanAmount: number,
   loanAPR: number,
   loanTermYears: number,
-  selectedEtf: ETF
+  selectedEtf: ETF,
+  crashYear: number | ''
 ): PortfolioDataPoint[] => {
   const monthlyPayment = calculateMonthlyPayment(loanAmount, loanAPR, loanTermYears);
   const totalMonths = loanTermYears * 12;
@@ -65,10 +66,20 @@ export const calculateGrowthData = (
   });
   
   for (let m = 1; m <= totalMonths; m++) {
-    // Scenario A: Invest the monthly payment from month 1 (using average return for conservative A)
+    // Check for Market Crash (at the start of the selected year)
+    if (crashYear !== '' && m === crashYear * 12) {
+      const dropFactor = 0.70; // 30% drop
+      balanceB_Avg *= dropFactor;
+      balanceB_Best *= dropFactor;
+      balanceB_Worst *= dropFactor;
+      // Balance A is invested monthly, so a crash also hits its accumulated value
+      balanceA *= dropFactor;
+    }
+
+    // Scenario A: Invest the monthly payment from month 1
     balanceA = balanceA * (1 + avgMonthlyReturn) + monthlyPayment;
     
-    // Scenario B: Growth only (as loan payoff is sync'd with comparison horizon, loan is active for whole period)
+    // Scenario B: Growth only
     balanceB_Avg = balanceB_Avg * (1 + avgMonthlyReturn);
     balanceB_Best = balanceB_Best * (1 + bestMonthlyReturn);
     balanceB_Worst = balanceB_Worst * (1 + worstMonthlyReturn);

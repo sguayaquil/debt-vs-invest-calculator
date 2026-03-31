@@ -32,6 +32,7 @@ const App: React.FC = () => {
   const [loanAPR, setLoanAPR] = useState<number | ''>(5);
   const [loanTerm, setLoanTerm] = useState<number | ''>(10);
   const [selectedEtf, setSelectedEtf] = useState(TOP_ETFS[1]); // Default VOO
+  const [crashYear, setCrashYear] = useState<number | ''>('');
 
   const nLoanAmount = Number(loanAmount) || 0;
   const nLoanAPR = Number(loanAPR) || 0;
@@ -43,8 +44,8 @@ const App: React.FC = () => {
   );
 
   const growthData = useMemo(() => 
-    calculateGrowthData(nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf),
-    [nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf]
+    calculateGrowthData(nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf, crashYear),
+    [nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf, crashYear]
   );
 
   const exportToPdf = () => {
@@ -163,6 +164,22 @@ const App: React.FC = () => {
                   </option>
                 ))}
               </select>
+            </label>
+            <label>
+              Simulate Crash in Year:
+              <input 
+                type="number" 
+                placeholder="None"
+                min="1"
+                max={nLoanTerm}
+                value={crashYear} 
+                onChange={e => {
+                  const val = e.target.value === '' ? '' : Number(e.target.value);
+                  if (val === '' || (val >= 0 && val <= nLoanTerm)) {
+                    setCrashYear(val);
+                  }
+                }} 
+              />
             </label>
             <div className="etf-info">
               <div className="etf-stat">
