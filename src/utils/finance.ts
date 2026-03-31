@@ -23,6 +23,7 @@ export const TOP_ETFS: ETF[] = [
   { symbol: 'VTI', name: 'Vanguard Total Stock Market', cagr: 13.69, volatility: 15.63 },
   { symbol: 'VXUS', name: 'Vanguard Total Intl Stock', cagr: 8.39, volatility: 14.34 },
   { symbol: 'BND', name: 'Vanguard Total Bond Market', cagr: 1.82, volatility: 4.21 },
+  { symbol: 'SAVINGS', name: 'High-Yield Savings Account', cagr: 4.00, volatility: 0.50 },
 ];
 
 export interface PortfolioDataPoint {
