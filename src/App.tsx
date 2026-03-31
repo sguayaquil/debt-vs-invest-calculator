@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import './App.css';
 import { calculateGrowthData, calculateMonthlyPayment, TOP_ETFS, calculateHistoricalBacktest } from './utils/finance';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +12,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -20,7 +23,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const App: React.FC = () => {
@@ -42,6 +46,18 @@ const App: React.FC = () => {
     calculateGrowthData(nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf),
     [nLoanAmount, nLoanAPR, nLoanTerm, selectedEtf]
   );
+
+  const exportToPdf = () => {
+    const element = document.getElementById('report-content');
+    const opt = {
+      margin: 10,
+      filename: `Financial_Report_${selectedEtf.symbol}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  };
 
   const chartData = {
     labels: growthData.map(d => `Year ${d.year}`),
@@ -94,9 +110,18 @@ const App: React.FC = () => {
   const backtest = calculateHistoricalBacktest(selectedEtf, nLoanTerm, nLoanAmount);
 
   return (
-    <div className="container">
+    <div className="container" id="report-content">
       <header>
-        <h1>Enhanced Debt vs. Invest Calculator</h1>
+        <div className="header-top">
+          <h1>Enhanced Debt vs. Invest Calculator</h1>
+          <button 
+            className="export-btn" 
+            onClick={exportToPdf}
+            data-html2canvas-ignore
+          >
+            Export PDF
+          </button>
+        </div>
         <p>Analyzing probability and historical context for {selectedEtf.symbol}.</p>
       </header>
 

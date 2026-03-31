@@ -6,13 +6,35 @@
 }
 
 header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 3rem;
 }
 
-header h1 {
-  font-size: 2.5rem;
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.5rem;
+}
+
+.export-btn {
+  background-color: #1a237e;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.export-btn:hover {
+  background-color: #3949ab;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin: 0;
   color: #1a237e;
 }
 
@@ -120,12 +142,14 @@ header p {
 }
 
 .historical-comparison {
-  margin-top: 2rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #444;
   text-align: left;
 }
 
 .historical-comparison h3 {
-  color: #1a237e;
+  color: white;
   margin-bottom: 1rem;
 }
 
