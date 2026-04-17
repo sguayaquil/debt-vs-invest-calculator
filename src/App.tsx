@@ -50,14 +50,34 @@ const App: React.FC = () => {
 
   const exportToPdf = () => {
     const element = document.getElementById('report-content');
+    if (!element) return;
+    
     const opt = {
       margin: 10,
       filename: `Financial_Report_${selectedEtf.symbol}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true,
+        logging: false,
+        width: 1200, // Explicitly capture 1200px
+        windowWidth: 1200,
+        onclone: (doc: Document) => {
+          const el = doc.getElementById('report-content');
+          if (el) {
+            el.style.width = '1200px';
+            el.style.maxWidth = '1200px';
+            el.style.minWidth = '1200px';
+            el.style.margin = '0';
+            el.style.padding = '20px';
+            el.style.left = '0';
+            el.style.top = '0';
+          }
+        }
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save();
+    (html2pdf() as any).set(opt).from(element).save();
   };
 
   const chartData = {
@@ -107,6 +127,9 @@ const App: React.FC = () => {
   
   const winner = finalA > finalBAvg ? 'Pay Off Debt First' : 'Invest Now (Avg)';
   const difference = Math.abs(finalA - finalBAvg);
+
+  const totalRepayment = monthlyPayment * (nLoanTerm * 12);
+  const totalInterestPaid = Math.max(0, totalRepayment - nLoanAmount);
 
   const backtest = calculateHistoricalBacktest(selectedEtf, nLoanTerm, nLoanAmount);
 
@@ -226,6 +249,40 @@ const App: React.FC = () => {
                 }
               }} 
             />
+          </div>
+
+          <div className="analysis-section">
+            <h3>Strategy Analysis & Justification</h3>
+            <div className="analysis-content">
+              <div className="analysis-card">
+                <h4>Interest Impact</h4>
+                <p>
+                  If you choose to carry the loan for the full {nLoanTerm} years, you will pay a total of 
+                  <strong> ${totalInterestPaid.toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong> in interest. 
+                  Paying off the debt immediately is equivalent to a guaranteed, risk-free return of <strong>{nLoanAPR}%</strong>.
+                </p>
+              </div>
+              <div className="analysis-card">
+                <h4>Recommendation Rationale</h4>
+                {finalA > finalBAvg ? (
+                  <p>
+                    <strong>Debt Payoff is prioritized:</strong> The high cost of interest (${totalInterestPaid.toLocaleString(undefined, { maximumFractionDigits: 0 })}) 
+                    outweighs the expected average growth of {selectedEtf.symbol}. By eliminating the debt, you "earn" the interest 
+                    saved and build a more stable foundation through monthly contributions.
+                  </p>
+                ) : (
+                  <p>
+                    <strong>Investment is prioritized:</strong> Despite paying ${totalInterestPaid.toLocaleString(undefined, { maximumFractionDigits: 0 })} in interest, 
+                    the historical {selectedEtf.cagr}% CAGR of {selectedEtf.symbol} generates significantly more wealth 
+                    by keeping your capital (${nLoanAmount.toLocaleString()}) fully deployed in the market from Day 1.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="risk-disclaimer">
+              * Note: Scenario A (Debt Payoff) provides a <strong>guaranteed</strong> outcome, whereas Scenario B 
+              relies on market performance and carries the risk of a {selectedEtf.volatility}% historical volatility.
+            </div>
           </div>
 
           <div className="historical-comparison">

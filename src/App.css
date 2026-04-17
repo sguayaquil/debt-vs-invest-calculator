@@ -141,6 +141,49 @@ header p {
   margin-bottom: 2rem;
 }
 
+.analysis-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.analysis-section h3 {
+  color: #1a237e;
+  margin-top: 0;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.analysis-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.analysis-card h4 {
+  margin-top: 0;
+  color: #3949ab;
+  font-size: 1.1rem;
+}
+
+.analysis-card p {
+  color: #444;
+  line-height: 1.6;
+}
+
+.risk-disclaimer {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #777;
+  font-style: italic;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
 .historical-comparison {
   margin-top: 3rem;
   padding-top: 2rem;
@@ -184,6 +227,30 @@ header p {
   margin: 0.5rem 0;
 }
 
+/* PDF Export Optimizations */
+#report-content {
+  width: 100%;
+  max-width: 1200px;
+  background: inherit;
+  overflow: visible;
+}
+
+.analysis-section, .summary-card, .chart-container, .historical-comparison {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.historical-comparison {
+  page-break-before: auto;
+  margin-top: 3rem;
+}
+
+@media print {
+  #report-content {
+    width: 1200px !important;
+  }
+}
+
 @media (max-width: 900px) {
   .main-grid {
     grid-template-columns: 1fr;
@@ -201,8 +268,31 @@ header p {
   .input-group h3 { color: #9fa8da; border-bottom-color: #444; }
   .input-group input, .input-group select { background: #3c3c3c; border-color: #555; color: white; }
   .etf-info { background: #3c3c3c; }
-  .summary-card { background: #2c2c2c; }
-  .chart-container { background: #2c2c2c; }
+  .summary-card {
+    background: #2c2c2c;
+  }
+
+  .analysis-section {
+    background: #2c2c2c;
+    color: #e0e0e0;
+  }
+
+  .analysis-section h3 {
+    color: #9fa8da;
+    border-bottom-color: #444;
+  }
+
+  .analysis-card h4 {
+    color: #9fa8da;
+  }
+
+  .analysis-card p {
+    color: #bbb;
+  }
+
+  .chart-container {
+    background: #2c2c2c;
+  }
   .backtest-card { background: #1a2633; border-top-color: #2196f3; }
   .backtest-card.secondary { background: #1b2e1c; border-top-color: #4caf50; }
   .backtest-card h4 { color: #bbb; }
